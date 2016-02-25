@@ -40,7 +40,7 @@ except NameError:
 
 
 # Constants
-DEFAULT_PLAYBACK = 'BASIC'
+DEFAULT_PLAYBACK = 'BANDWIDTH'
 DOWNLOAD_CHUNK = 1024
 
 # Globals for arg parser with the default values
@@ -328,11 +328,15 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
                                                                              get_segment_sizes(dp_object,
                                                                                                segment_number+1),
                                                                              past_rebuf_count)
+
                     except IndexError, e:
                         config_dash.LOG.error(e)
 
-                config_dash.LOG.info("Baandwidth-DASH: Selected {} for the segment {}".format(current_bitrate,
+                config_dash.LOG.info("Bandwidth-DASH: Selected {} for the segment {}".format(current_bitrate,
                                                                                          segment_number + 1))
+
+                config_dash.LOG.info("Bandwidth-DASH: Delay {} for the segment {}".format(delay, segment_number))
+
 
 #------------------------------------END BANDWIDTH CODE----------------------------------
 #----------------------------------------------------------------------------------------
@@ -372,7 +376,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
         config_dash.LOG.info("{} : The total downloaded = {}, segment_size = {}, segment_number = {}".format(
             playback_type.upper(),
             total_downloaded, segment_size, segment_number))
-        if playback_type.upper() == "SMART" and weighted_mean_object:
+        if (playback_type.upper() == "SMART" or playback_type.upper() == "BANDWIDTH") and weighted_mean_object:
             weighted_mean_object.update_weighted_mean(segment_size, segment_download_time)
 
         segment_info = {'playback_length': video_segment_duration,

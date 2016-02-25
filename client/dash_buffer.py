@@ -106,24 +106,24 @@ class DashPlayer:
                     buffering = True
 
 #----------------PUT IN THE KEEP TRACK OF HOW MANY TIMES IT DIDN'T BUFFER--------------------------#
-                        temp_time = time.time()
-                        start = 0
-                        end = config_dash.BANDWIDTH_SAMPLE_COUNT - 1
-                        if temp_time - config_dash.last_rebuffer < config_dash.BANDWIDTH_SAMPLE_COUNT:
-                            start = (config_dash.last_rebuffer + 1) % config_dash.BANDWIDTH_SAMPLE_COUNT
-                            end = (temp_time - 1) % config_dash.BANDWIDTH_SAMPLE_COUNT
+                    temp_time = int(time.time())
+                    start = 0
+                    end = config_dash.BANDWIDTH_SAMPLE_COUNT - 1
+                    if temp_time - config_dash.last_rebuffer < config_dash.BANDWIDTH_SAMPLE_COUNT:
+                        start = (config_dash.last_rebuffer + 1) % config_dash.BANDWIDTH_SAMPLE_COUNT
+                        end = (temp_time - 1) % config_dash.BANDWIDTH_SAMPLE_COUNT
 
-                        if start < end:
-                            for i in range(start, end - 1):
-                                config_dash.past_rebuffers[i] = False
-                        else:
-                            for i in range(start, BANDWIDTH_SAMPLE_COUNT - 1):
-                                config_dash.past_rebuffers[i] = False
-                            for i in range(0, end - 1):
-                                config_dash.past_rebuffers[i] = False
+                    if start < end:
+                        for i in range(start, end - 1):
+                            config_dash.past_rebuffers[i] = False
+                    else:
+                        for i in range(start, BANDWIDTH_SAMPLE_COUNT - 1):
+                            config_dash.past_rebuffers[i] = False
+                        for i in range(0, end - 1):
+                            config_dash.past_rebuffers[i] = False
 
-                        config_dash.past_rebuffers[temp_time % 20] = True
-                        last_rebuffer = temp_time
+                    config_dash.past_rebuffers[temp_time % 20] = True
+                    last_rebuffer = temp_time
 #-----------------------------------------------------------------------------------------
 
                     interruption_start = time.time()
