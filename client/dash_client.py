@@ -26,7 +26,7 @@ from string import ascii_letters, digits
 from argparse import ArgumentParser
 from multiprocessing import Process, Queue
 from collections import defaultdict
-from adaptation import basic_dash, basic_dash2, weighted_dash, netflix_dash
+from adaptation import basic_dash, basic_dash2, weighted_dash, netflix_dash, bandwidth_dash
 from adaptation.adaptation import WeightedMean
 import config_dash
 import dash_buffer
@@ -230,6 +230,15 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
     # Netflix Variables
     average_segment_sizes = netflix_rate_map = None
     netflix_state = "INITIAL"
+
+#-----------------------------------------------
+# Adding variables for bandwidth algorithm
+#-----------------------------------------------
+    past_rebuffers = [False] * config_dash.BANDWIDTH_SAMPLE_COUNT
+    last_rebuffer = 0
+
+
+
     # Start playback of all the segments
     for segment_number, segment in enumerate(dp_list, dp_object.video[current_bitrate].start):
         config_dash.LOG.info(" {}: Processing the segment {}".format(playback_type.upper(), segment_number))
@@ -294,6 +303,41 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
                 if dash_player.buffer.qsize() >= config_dash.NETFLIX_BUFFER_SIZE:
                     delay = (dash_player.buffer.qsize() - config_dash.NETFLIX_BUFFER_SIZE + 1) * segment_duration
                     config_dash.LOG.info("NETFLIX: delay = {} seconds".format(delay))
+
+#----------------------------------------------------------------------------------------
+#------------------------------ADDED BANDWIDTH CODE--------------------------------------
+#----------------------------------------------------------------------------------------
+
+            elif playback_type.upper() == "BANDWIDTH":
+                if not weighted_mean_object:
+                    weighted_mean_object = WeightedMean(config_dash.BANDWIDTH_SAMPLE_COUNT)
+                    #config_dash.LOG.debug("Initializing the weighted Mean object")
+                    config_dash.LOG.info("Initializing the weighted Mean object")
+
+                past_rebuf_count = 0
+                for i in config_dash.past_rebuffers:
+                    if i:
+                        past_rebuf_count = past_rebuf_count + 1
+
+                # Checking the segment number is in acceptable range
+                if segment_number < len(dp_list) - 1 + dp_object.video[bitrate].start:
+                    try:
+                        current_bitrate, delay = bandwidth_dash.bandwidth_dash(bitrates, dash_player,
+                                                                             weighted_mean_object.weighted_mean_rate,
+                                                                             current_bitrate,
+                                                                             get_segment_sizes(dp_object,
+                                                                                               segment_number+1),
+                                                                             past_rebuf_count)
+                    except IndexError, e:
+                        config_dash.LOG.error(e)
+
+                config_dash.LOG.info("Baandwidth-DASH: Selected {} for the segment {}".format(current_bitrate,
+                                                                                         segment_number + 1))
+
+#------------------------------------END BANDWIDTH CODE----------------------------------
+#----------------------------------------------------------------------------------------
+
+
             else:
                 config_dash.LOG.error("Unknown playback type:{}. Continuing with basic playback".format(playback_type))
                 current_bitrate, average_dwn_time = basic_dash.basic_dash(segment_number, bitrates, average_dwn_time,
@@ -508,6 +552,12 @@ def main():
     elif "netflix" in PLAYBACK.lower():
         config_dash.LOG.critical("Started Netflix-DASH Playback")
         start_playback_smart(dp_object, domain, "NETFLIX", DOWNLOAD, video_segment_duration)
+#--------------------------------------------------------------------------------------
+#---------------------MORE ADDED-------------------------------------------------------
+    elif "bandwidth" in PLAYBACK.lower():
+        config_dash.LOG.critical("Started Bandwidth-DASH Playback")
+        start_playback_smart(dp_object, domain, "BANDWIDTH", DOWNLOAD, video_segment_duration)
+#--------------------------------------------------------------------------------------
     else:
         config_dash.LOG.error("Unknown Playback parameter {}".format(PLAYBACK))
         return None
