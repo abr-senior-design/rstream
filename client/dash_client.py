@@ -40,7 +40,7 @@ except NameError:
 
 
 # Constants
-DEFAULT_PLAYBACK = 'BANDWIDTH'
+DEFAULT_PLAYBACK = 'BASIC'
 DOWNLOAD_CHUNK = 1024
 
 # Globals for arg parser with the default values
