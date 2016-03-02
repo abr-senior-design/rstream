@@ -21,7 +21,7 @@ def weighted_dash(bitrates, dash_player, weighted_dwn_rate, curr_bitrate, next_s
     # If the buffer is less that the Initial buffer, playback remains at th lowest bitrate
     # i.e dash_buffer.current_buffer < dash_buffer.initial_buffer
     available_video_duration = available_video_segments * dash_player.segment_duration
-    config_dash.LOG.debug("Buffer_length = {} Initial Buffer = {} Available video = {} seconds, alpha = {}. "
+    config_dash.LOG.info("!!!!!!!!!!!!!!!!!!!!!!!!Buffer_length = {} Initial Buffer = {} Available video = {} seconds, alpha = {}. "
                           "Beta = {} WDR = {}, curr Rate = {}".format(dash_player.buffer.qsize(),
                                                                       dash_player.initial_buffer,
                                                                       available_video_duration, dash_player.alpha,

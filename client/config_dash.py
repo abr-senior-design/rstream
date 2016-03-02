@@ -80,6 +80,16 @@ NETFLIX_BUFFER_SIZE = 60
 NETFLIX_INITIAL_BUFFER = 2
 NETFLIX_INITIAL_FACTOR = 0.875
 
+# ---------------------------------------------------
+# Bandwidth ADAPTATION
+# ---------------------------------------------------
+# Constants for the bandwidth algorithm. The number of
+# samples the algorithm should take as well as variables
+# to record the past number of rebuffers
+BANDWIDTH_SAMPLE_COUNT = 20
+past_rebuffers = [False] * BANDWIDTH_SAMPLE_COUNT
+last_rebuffer = 0
+
 # For ping.py
 PING_PACKETS = 10
 ping_option_nb_pkts = PING_PACKETS
