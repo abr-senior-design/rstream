@@ -2,9 +2,10 @@ __author__ = 'pjuluri'
 
 import config_dash
 import random
+import time
 
 
-def bandwidth_dash(bitrates, dash_player, weighted_dwn_rate, curr_bitrate, next_segment_sizes, past_rebuffer):
+def bandwidth_dash(bitrates, dash_player, weighted_dwn_rate, curr_bitrate, next_segment_sizes):
     """
     Module to predict the next_bitrate using the weighted_dash algorithm
     :param bitrates: List of bitrates
@@ -16,6 +17,11 @@ def bandwidth_dash(bitrates, dash_player, weighted_dwn_rate, curr_bitrate, next_
 
     bitrates = [int(i) for i in bitrates]
     bitrates.sort()
+
+    past_switch_count = 0
+    for i in config_dash.past_switches:
+        if i:
+            past_switch_count += 1
 
     # Waiting time before downloading the next segment
     delay = 0
@@ -51,9 +57,9 @@ def bandwidth_dash(bitrates, dash_player, weighted_dwn_rate, curr_bitrate, next_
     if next_bitrate != curr_bitrate:
 
         curr_bitrate_score = (get_score_eff(next_bitrate, curr_bitrate, weighted_dwn_rate, alph)
-            + get_score_stability(curr_bitrate, curr_bitrate, past_rebuffer))
+            + get_score_stability(curr_bitrate, curr_bitrate, past_switch_count))
         next_bitrate_score = (get_score_eff(next_bitrate, next_bitrate, weighted_dwn_rate, alph)
-            + get_score_stability(curr_bitrate, next_bitrate, past_rebuffer))
+            + get_score_stability(curr_bitrate, next_bitrate, past_switch_count))
 
         if (curr_bitrate_score < next_bitrate_score):
             next_bitrate = curr_bitrate
@@ -73,6 +79,26 @@ def bandwidth_dash(bitrates, dash_player, weighted_dwn_rate, curr_bitrate, next_
     config_dash.LOG.debug("The next_bitrate is assigned as {}".format(next_bitrate))
     config_dash.LOG.info("Delay:{}".format(delay))
 
+    if next_bitrate != curr_bitrate:
+        temp_time = int(time.time())
+        start = 0
+        end = config_dash.BANDWIDTH_SAMPLE_COUNT - 1
+        if temp_time - config_dash.last_switch < config_dash.BANDWIDTH_SAMPLE_COUNT:
+            start = (config_dash.last_switch + 1) % config_dash.BANDWIDTH_SAMPLE_COUNT
+            end = (temp_time - 1) % config_dash.BANDWIDTH_SAMPLE_COUNT
+
+        if start < end:
+                for i in range(start, end - 1):
+                    config_dash.past_switches[i] = False
+        else:
+            for i in range(start, config_dash.BANDWIDTH_SAMPLE_COUNT - 1):
+                config_dash.past_switches[i] = False
+            for i in range(0, end - 1):
+                config_dash.past_switches[i] = False
+
+        config_dash.past_switches[temp_time % 20] = True
+        config_dash.last_switch = temp_time
+
     return next_bitrate, delay
 
 def get_score_eff(next_bitrate, bitrate, est_band, alph):
@@ -80,8 +106,8 @@ def get_score_eff(next_bitrate, bitrate, est_band, alph):
 
 
 #CHANGE PAS_REBUFFER TO PAST_QUALITY SWITCHES
-def get_score_stability(curr_bitrate, bitrate, past_rebuffer):
+def get_score_stability(curr_bitrate, bitrate, past_switch_count):
     if curr_bitrate == bitrate:
-        return 2**past_rebuffer
-    return 2**past_rebuffer + 1
+        return 2**past_switch_count
+    return 2**past_switch_count + 1
 

@@ -87,8 +87,8 @@ NETFLIX_INITIAL_FACTOR = 0.875
 # samples the algorithm should take as well as variables
 # to record the past number of rebuffers
 BANDWIDTH_SAMPLE_COUNT = 20
-past_rebuffers = [False] * BANDWIDTH_SAMPLE_COUNT
-last_rebuffer = 0
+past_switches = [False] * BANDWIDTH_SAMPLE_COUNT
+last_switch = 0
 
 # For ping.py
 PING_PACKETS = 10

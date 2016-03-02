@@ -234,9 +234,6 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
 #-----------------------------------------------
 # Adding variables for bandwidth algorithm
 #-----------------------------------------------
-    past_rebuffers = [False] * config_dash.BANDWIDTH_SAMPLE_COUNT
-    last_rebuffer = 0
-
 
 
     # Start playback of all the segments
@@ -323,11 +320,6 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
                     #config_dash.LOG.debug("Initializing the weighted Mean object")
                     config_dash.LOG.info("Initializing the weighted Mean object")
 
-                past_rebuf_count = 0
-                for i in config_dash.past_rebuffers:
-                    if i:
-                        past_rebuf_count = past_rebuf_count + 1
-
                 # Checking the segment number is in acceptable range
                 if segment_number < len(dp_list) - 1 + dp_object.video[bitrate].start:
                     try:
@@ -335,8 +327,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
                                                                              weighted_mean_object.weighted_mean_rate,
                                                                              current_bitrate,
                                                                              get_segment_sizes(dp_object,
-                                                                                               segment_number+1),
-                                                                             past_rebuf_count)
+                                                                                               segment_number+1))
 
                     except IndexError, e:
                         config_dash.LOG.error(e)
@@ -571,6 +562,12 @@ def main():
     elif "bandwidth" in PLAYBACK.lower():
         config_dash.LOG.critical("Started Bandwidth-DASH Playback")
         start_playback_smart(dp_object, domain, "BANDWIDTH", DOWNLOAD, video_segment_duration)
+    elif "lowest" in PLAYBACK.lower():
+        config_dash.LOG.critical("Started Lowest Playback")
+        start_playback_smart(dp_object, domain, "LOWEST", DOWNLOAD, video_segment_duration)
+    elif "highest" in PLAYBACK.lower():
+        config_dash.LOG.critical("Started Highest Playback")
+        start_playback_smart(dp_object, domain, "HIGHEST", DOWNLOAD, video_segment_duration)
 #--------------------------------------------------------------------------------------
     else:
         config_dash.LOG.error("Unknown Playback parameter {}".format(PLAYBACK))
