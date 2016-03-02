@@ -91,7 +91,7 @@ def bandwidth_dash(bitrates, dash_player, weighted_dwn_rate, curr_bitrate, next_
                 for i in range(start, end - 1):
                     config_dash.past_switches[i] = False
         else:
-            for i in range(start, BANDWIDTH_SAMPLE_COUNT - 1):
+            for i in range(start, config_dash.BANDWIDTH_SAMPLE_COUNT - 1):
                 config_dash.past_switches[i] = False
             for i in range(0, end - 1):
                 config_dash.past_switches[i] = False

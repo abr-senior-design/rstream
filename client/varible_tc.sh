@@ -3,57 +3,74 @@
 MAXIMUM_BADWIDTH=18000
 MINIMUM_BANDWIDTH=0
 
-$LO=$MINIMUM_BANDWIDTH
-$HI=$MAXIMUM_BANDWIDTH
-$NUM=$((RANDOM % $((MAXIMUM_BANDWIDTH/2)) ))
-$NUM=$((NUM - $((MAXIMUM_BANDWIDTH/4)) ))
+LO=$MINIMUM_BANDWIDTH
+HI=18000
+NUM=$((RANDOM % $((18000/2)) ))
+NUM=$((NUM - $((18000/4)) ))
 
-$TEMP=0
+TEMP=0
 
 switch_rate() {
-    $NUM=$((RANDOM % $((MAXIMUM_BANDWIDTH/2)) ))
-    $NUM=$((NUM - $((MAXIMUM_BANDWIDTH/4)) ))
+    MOD=$((18000 / 2))
+    NUM=$((RANDOM % MOD ))
+    MOD=$((MOD / 2))
+    NUM=$((NUM - MOD ))
 
-    $TEMP=$((HIGH + NUM))
+    TEMP=$((HI + NUM))
 
-    while [ $TEMP -gt $MAXIMUM_BANDWIDTH || $TEMP -lt $MINIMUM_BANDWIDTH ]; do
-        $NUM=$((RANDOM % $((MAXIMUM_BANDWIDTH/2)) ))
-        $NUM=$((NUM - $((MAXIMUM_BANDWIDTH/4)) ))
+    while [ $TEMP -gt 18000 -a $TEMP -lt 0 ]; do
+        NUM=$((RANDOM % $(( 18000 /2)) ))
+        NUM=$((NUM - $(( 18000 /4)) ))
 
-        $TEMP=$((HIGH + NUM))
+        TEMP=$((HI + NUM))
     done
 
-    $HIGH=$TEMP;
-
+    HI=$TEMP;
 }
-
-$FILE=ASTREAM_LOGS/limit_bandwidth.csv
+FILE=ASTREAM_LOGS/limit_bandwidth.csv
 
 touch $FILE
 
-$START="$(date +%s)"
+START="$(date +%s)"
+HI_S=$HI"kbps"
+echo $HI_S
 
-sudo tc qdisc add dev lo root handle 1: htb default 12
-sudo tc class add dev lo parent 1:1 classid 1:12 htb rate $LO_S ceil $HIGH_S
+    sudo tc qdisc del dev lo root
 
-$DIFF="$(date +%s)"
-$DIFF=$((DIFF - START))
+    sudo tc qdisc add dev lo root handle 1: htb default 12
+    sudo tc class add dev lo parent 1:1 classid 1:12 htb rate $HI_S
+
+DIFF="$(date +%s)"
+DIFF=$((DIFF - START))
 
 echo $DIFF,$HI >> $FILE
 
 while true; do
 
-    switch_rate
+    MOD=$((18000 / 2))
+    NUM=$((RANDOM % MOD ))
+    MOD=$((MOD / 2))
+    NUM=$((NUM - MOD ))
 
-    sudo tc qdisc change dev lo root handle 1: htb default 12
-    sudo tc class change dev lo parent 1:1 classid 1:12 htb rate $LO_S ceil $HIGH_S
+    TEMP=$((HI + NUM))
 
-    $DIFF="$(date +%s)"
-    $DIFF=$((DIFF - START))
+    while [ $TEMP -gt 18000 -o $TEMP -lt 0 ]; do
+        NUM=$((RANDOM % $(( 18000 /2)) ))
+        NUM=$((NUM - $(( 18000 /4)) ))
+
+        TEMP=$((HI + NUM))
+    done
+
+    HI=$TEMP
+
+    sudo tc class replace dev lo parent 1:1 classid 1:12 htb rate $HI_S
+
+    DIFF="$(date +%s)"
+    DIFF=$((DIFF - START))
 
     echo $DIFF,$HI >> $FILE
 
-    sleep 4s
+    sleep 1s
 #tc qdisc add dev lo parent 1:12 netem delay 200ms
 #don't really need latency, just bandwidth reduction
 

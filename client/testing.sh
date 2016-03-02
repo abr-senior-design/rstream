@@ -1,6 +1,6 @@
 #!/bin/bash/
 
-bash variable_tc.sh &
+#bash variable_tc.sh &
 
 COUNTER=3
 TYPE=(basic, smart, netflix, bandwidth, lowest, highest)
@@ -10,6 +10,7 @@ until [ $COUNTER -lt 0 ]; do
     let COUNTER-=1
 done
 
-pkill -f variable_tc.sh
+wait
+#pkill -f variable_tc.sh
 
-tc qdisc del dev lo root
+#sudo tc qdisc del dev lo root

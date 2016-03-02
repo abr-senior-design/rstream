@@ -27,7 +27,12 @@ for FILE in ASTREAM_LOGS/*[0-9].csv; do
         set xlabel "Epoch Time"
         set ylabel "Average rebuffering per 30 seconds"
         set datafile separator ","
+	set term png
         set output "$BASE.bandwidth.png"
         plot "$NEWFILE" using 0:1 with lines
+
+	set ylabel "BitRate"
+	set output "$BASE.png"
+	plot "$FILE" using 0:6 with lines
 EOF
 done
