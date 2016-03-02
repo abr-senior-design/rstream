@@ -254,7 +254,15 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
         if segment_number == dp_object.video[bitrate].start:
             current_bitrate = bitrates[0]
         else:
-            if playback_type.upper() == "BASIC":
+#--------------------ADDING BASIC PLAYBACKS FOR TESTING----------------------#
+            if playback_type.upper() == "LOWEST":
+                current_bitrate = bitrates[0]
+                delay = 0
+            elif playback_type.upper() == "HIGHEST":
+                current_bitrate = bitrates[-1]
+                delay = 0
+#--------------------ENDING BASIC PLAYBACKS-------------------------------#
+            elif playback_type.upper() == "BASIC":
                 current_bitrate, average_dwn_time = basic_dash2.basic_dash2(segment_number, bitrates, average_dwn_time,
                                                                             recent_download_sizes,
                                                                             previous_segment_times, current_bitrate)
