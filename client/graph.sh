@@ -2,7 +2,7 @@
 
 for FILE in ASTREAM_LOGS/*[0-9].csv; do
     START=0
-    END=30
+    END=10
     BASE="$(echo $FILE | rev | cut -c 5- | rev)"
     NEWFILE=$BASE.bandwidth.csv
     touch $NEWFILE
@@ -19,8 +19,8 @@ for FILE in ASTREAM_LOGS/*[0-9].csv; do
 
        echo $MID,$COUNTER >> $NEWFILE
 
-       START=$((START+30))
-       END=$((END+30))
+       START=$((START+10))
+       END=$((END+10))
     done
 
     gnuplot <<- EOF
@@ -29,10 +29,13 @@ for FILE in ASTREAM_LOGS/*[0-9].csv; do
         set datafile separator ","
 	set term png
         set output "$BASE.bandwidth.png"
-        plot "$NEWFILE" using 0:1 with lines
+        plot "$NEWFILE" using ($0 + 1):1 with lines
 
 	set ylabel "BitRate"
 	set output "$BASE.png"
 	plot "$FILE" using 0:6 with lines
 EOF
 done
+
+gnuplot <<- EOF
+    set xlabel "Epoch Time"

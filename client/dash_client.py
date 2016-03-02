@@ -234,9 +234,6 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
 #-----------------------------------------------
 # Adding variables for bandwidth algorithm
 #-----------------------------------------------
-    past_rebuffers = [False] * config_dash.BANDWIDTH_SAMPLE_COUNT
-    last_rebuffer = 0
-
 
 
     # Start playback of all the segments
@@ -569,6 +566,12 @@ def main():
     elif "bandwidth" in PLAYBACK.lower():
         config_dash.LOG.critical("Started Bandwidth-DASH Playback")
         start_playback_smart(dp_object, domain, "BANDWIDTH", DOWNLOAD, video_segment_duration)
+    elif "lowest" in PLAYBACK.lower():
+        config_dash.LOG.critical("Started Lowest Playback")
+        start_playback_smart(dp_object, domain, "LOWEST", DOWNLOAD, video_segment_duration)
+    elif "highest" in PLAYBACK.lower():
+        config_dash.LOG.critical("Started Highest Playback")
+        start_playback_smart(dp_object, domain, "HIGHEST", DOWNLOAD, video_segment_duration)
 #--------------------------------------------------------------------------------------
     else:
         config_dash.LOG.error("Unknown Playback parameter {}".format(PLAYBACK))

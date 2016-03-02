@@ -33,6 +33,7 @@ touch $FILE
 
 START="$(date +%s)"
 HI_S=$HI"kbps"
+
 echo $HI_S
 
     sudo tc qdisc del dev lo root
@@ -41,6 +42,9 @@ echo $HI_S
     sudo tc class add dev lo parent 1:1 classid 1:12 htb rate $HI_S
 
 DIFF="$(date +%s)"
+
+echo $DIFF >> $FILE
+
 DIFF=$((DIFF - START))
 
 echo $DIFF,$HI >> $FILE
