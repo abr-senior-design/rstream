@@ -164,17 +164,16 @@ def getFileSizeForSegment(request=None):
         print "File not found in directory"
     return 10000
 
-def generateRandomText(size):
-    text="a\n"*(size/2)
-    return text
 
 def dummy_reply(output, size):
     start_time=time.time()
 
-    # Generate random text of length size
-    response_text=generateRandomText(size)
-    output.write(response_text)
-    output.flush
+    block_size = 1000
+    size_remaining = size
+    while size_remaining > 0:
+        output.write('a' * ( block_size - 1) + '\n')
+        size_remaining -= block_size
+    output.flush()
 
     now=time.time()
     return now - start_time, size
