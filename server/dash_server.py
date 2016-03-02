@@ -145,26 +145,6 @@ class MyHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if shutdown:
             self.server.shutdown()
 
-def getFileSizeForSegment(request=None):
-    if not request:
-        request = "media/x4ukwHdACDw/video/2/seg-0005.m4f"
-    video_name = request.split('/')[1]
-    size_file = "media/{}/{}_file_size.txt".format(video_name, video_name)
-    try:
-        mydict = {}
-        with open(size_file, 'r') as file:
-            text = file.read()
-            for line in text.replace('\\','/').strip().split('\n'):
-                key, value = line.strip().split(' ')
-                mydict[key] = value
-        return int(mydict[request])
-    except IOError:
-        print "Size File not found"
-    except KeyError:
-        print "File not found in directory"
-    return 10000
-
-
 def dummy_reply(output, size):
     start_time=time.time()
 
