@@ -328,11 +328,6 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
                     #config_dash.LOG.debug("Initializing the weighted Mean object")
                     config_dash.LOG.info("Initializing the weighted Mean object")
 
-                past_rebuf_count = 0
-                for i in config_dash.past_rebuffers:
-                    if i:
-                        past_rebuf_count = past_rebuf_count + 1
-
                 # Checking the segment number is in acceptable range
                 if segment_number < len(dp_list) - 1 + dp_object.video[bitrate].start:
                     try:
@@ -340,8 +335,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
                                                                              weighted_mean_object.weighted_mean_rate,
                                                                              current_bitrate,
                                                                              get_segment_sizes(dp_object,
-                                                                                               segment_number+1),
-                                                                             past_rebuf_count)
+                                                                                               segment_number+1))
 
                     except IndexError, e:
                         config_dash.LOG.error(e)
