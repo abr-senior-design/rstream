@@ -241,6 +241,12 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
 
     # Start playback of all the segments
     for segment_number, segment in enumerate(dp_list, dp_object.video[current_bitrate].start):
+
+        #play only the first twenty segments
+        if(segment_number == 20):
+            dash_player.playback_state = 'END'
+            break
+
         config_dash.LOG.info(" {}: Processing the segment {}".format(playback_type.upper(), segment_number))
         write_json()
         if not previous_bitrate:
@@ -558,7 +564,7 @@ def main():
     elif "basic" in PLAYBACK.lower():
         config_dash.LOG.critical("Started Basic-DASH Playback")
         start_playback_smart(dp_object, domain, "BASIC", DOWNLOAD, video_segment_duration)
-    elif "sara" in PLAYBACK.lower():
+    elif "smart" in PLAYBACK.lower():
         config_dash.LOG.critical("Started SARA-DASH Playback")
         start_playback_smart(dp_object, domain, "SMART", DOWNLOAD, video_segment_duration)
     elif "netflix" in PLAYBACK.lower():
