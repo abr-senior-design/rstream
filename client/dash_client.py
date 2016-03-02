@@ -49,7 +49,7 @@ MPD = None
 LIST = False
 PLAYBACK = DEFAULT_PLAYBACK
 DOWNLOAD = False
-SEGMENT_LIMIT = None
+SEGMENT_LIMIT = 20
 
 
 class DashPlayback:
@@ -214,9 +214,9 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
             dp_list[segment_count][bitrate] = segment_url
     bitrates = dp_object.video.keys()
     bitrates.sort()
-    average_dwn_time = 0
     segment_files = []
     # For basic adaptation
+    average_dwn_time = 0
     previous_segment_times = []
     recent_download_sizes = []
     weighted_mean_object = None
@@ -241,11 +241,6 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
 
     # Start playback of all the segments
     for segment_number, segment in enumerate(dp_list, dp_object.video[current_bitrate].start):
-
-        #play only the first twenty segments
-        if(segment_number == 20):
-            dash_player.playback_state = 'END'
-            break
 
         config_dash.LOG.info(" {}: Processing the segment {}".format(playback_type.upper(), segment_number))
         write_json()
@@ -380,6 +375,7 @@ def start_playback_smart(dp_object, domain, playback_type=None, download=False, 
         segment_download_time = timeit.default_timer() - start_time
         previous_segment_times.append(segment_download_time)
         recent_download_sizes.append(segment_size)
+
         # Updating the JSON information
         segment_name = os.path.split(segment_url)[1]
         if "segment_info" not in config_dash.JSON_HANDLE:
