@@ -1,26 +1,25 @@
 #!/bin/bash
 
-MAXIMUM_BADWIDTH=18000
+MAXIMUM_BADWIDTH=19
 MINIMUM_BANDWIDTH=0
 
-LO=$MINIMUM_BANDWIDTH
-HI=18000
-NUM=$((RANDOM % $((18000/2)) ))
-NUM=$((NUM - $((18000/4)) ))
+HI=19
+NUM=$((RANDOM % $((19/2)) ))
+NUM=$((NUM - $((19/4)) ))
 
 TEMP=0
 
 switch_rate() {
-    MOD=$((18000 / 2))
+    MOD=$((19 / 2))
     NUM=$((RANDOM % MOD ))
     MOD=$((MOD / 2))
     NUM=$((NUM - MOD ))
 
     TEMP=$((HI + NUM))
 
-    while [ $TEMP -gt 18000 -a $TEMP -lt 0 ]; do
-        NUM=$((RANDOM % $(( 18000 /2)) ))
-        NUM=$((NUM - $(( 18000 /4)) ))
+    while [ $TEMP -gt 19 -a $TEMP -lt 0 ]; do
+        NUM=$((RANDOM % $(( 19 /2)) ))
+        NUM=$((NUM - $(( 19 /4)) ))
 
         TEMP=$((HI + NUM))
     done
@@ -32,7 +31,7 @@ FILE=ASTREAM_LOGS/limit_bandwidth.csv
 touch $FILE
 
 START="$(date +%s)"
-HI_S=$HI"kbps"
+HI_S=$HI"Mbps"
 
 echo $HI_S
 
@@ -51,16 +50,16 @@ echo $DIFF,$HI >> $FILE
 
 while true; do
 
-    MOD=$((18000 / 2))
+    MOD=$((19 / 2))
     NUM=$((RANDOM % MOD ))
     MOD=$((MOD / 2))
     NUM=$((NUM - MOD ))
 
     TEMP=$((HI + NUM))
 
-    while [ $TEMP -gt 18000 -o $TEMP -lt 0 ]; do
-        NUM=$((RANDOM % $(( 18000 /2)) ))
-        NUM=$((NUM - $(( 18000 /4)) ))
+    while [ $TEMP -gt 19 -o $TEMP -lt 0 ]; do
+        NUM=$((RANDOM % $(( 19 /2)) ))
+        NUM=$((NUM - $(( 19 /4)) ))
 
         TEMP=$((HI + NUM))
     done
