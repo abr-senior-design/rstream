@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for FILE in ASTREAM_LOGS/*[0-9].csv; do
+for FILE in SMART/*[0-9].csv; do
     START=0
     END=10
     BASE="$(echo $FILE | rev | cut -c 5- | rev)"

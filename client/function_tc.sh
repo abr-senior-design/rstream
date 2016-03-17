@@ -4,6 +4,8 @@ INPUT=limit_bandwidth.csv
 
 FILE=ASTREAM_LOGS/limit_bandwidth.csv
 
+INPUT=$FILE
+
 touch $FILE
 
 START="$(date +%s)"
@@ -18,14 +20,14 @@ IFS=,
 [ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
 while read epchtm bndwth
 do
-    echo "Bandwidth is: $bndwth"
-    sudo tc class replace dev lo parent 1:1 classid 1:12 htb rate $bndwth"MBps"
+    #echo "Bandwidth is: $bndwth"
+    sudo tc class replace dev lo parent 1:1 classid 1:12 htb rate $bndwth"kbps"
 
 
     DIFF="$(date +%s)"
     DIFF=$((DIFF - START))
 
-    echo $DIFF,$bndwth >> $FILE
+    #echo $DIFF,$bndwth >> $FILE
 
     sleep 1s
 done < $INPUT
